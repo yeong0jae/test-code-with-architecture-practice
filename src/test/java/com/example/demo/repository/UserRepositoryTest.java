@@ -13,7 +13,7 @@ import com.example.demo.model.UserStatus;
 
 @DataJpaTest // DataJpaTest 어노테이션을 사용하면 JPA 관련된 설정만 로드하고, H2 데이터베이스를 사용하게 된다.
 @Sql("/sql/user-repository-test-data.sql") // @Sql 어노테이션을 사용하면 테스트 전에 SQL 파일을 실행할 수 있다.
-public class UserRepositoryTest {
+public class  UserRepositoryTest {
 
 	@Autowired
 	private UserRepository userRepository;
