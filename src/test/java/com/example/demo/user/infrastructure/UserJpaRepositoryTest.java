@@ -13,17 +13,17 @@ import com.example.demo.user.domain.UserStatus;
 
 @DataJpaTest // DataJpaTest 어노테이션을 사용하면 JPA 관련된 설정만 로드하고, H2 데이터베이스를 사용하게 된다.
 @Sql("/sql/user-repository-test-data.sql") // @Sql 어노테이션을 사용하면 테스트 전에 SQL 파일을 실행할 수 있다.
-public class  UserRepositoryTest {
+public class UserJpaRepositoryTest {
 
 	@Autowired
-	private UserRepository userRepository;
+	private UserJpaRepository userJpaRepository;
 
 	@Test
 	void findByIdAndStatus_로_유저를_찾을_수_있다() {
 		// given
 		// when
 
-		Optional<UserEntity> result = userRepository.findByIdAndStatus(1, UserStatus.ACTIVE);
+		Optional<UserEntity> result = userJpaRepository.findByIdAndStatus(1, UserStatus.ACTIVE);
 
 		// then
 		assertThat(result.isPresent()).isTrue();
@@ -34,7 +34,7 @@ public class  UserRepositoryTest {
 	void findByIdAndStatus_는_데이터가_없으면_Optional_empty_를_내려준다() {
 		// given
 		// when
-		Optional<UserEntity> result = userRepository.findByIdAndStatus(1, UserStatus.PENDING);
+		Optional<UserEntity> result = userJpaRepository.findByIdAndStatus(1, UserStatus.PENDING);
 
 		// then
 		assertThat(result.isEmpty()).isTrue();
@@ -46,7 +46,7 @@ public class  UserRepositoryTest {
 		// given
 		// when
 
-		Optional<UserEntity> result = userRepository.findByEmailAndStatus("kyj91032@naver.com", UserStatus.ACTIVE);
+		Optional<UserEntity> result = userJpaRepository.findByEmailAndStatus("kyj91032@naver.com", UserStatus.ACTIVE);
 
 		// then
 		assertThat(result.isPresent()).isTrue();
@@ -57,7 +57,7 @@ public class  UserRepositoryTest {
 	void findByEmailAndStatus_는_데이터가_없으면_Optional_empty_를_내려준다() {
 		// given
 		// when
-		Optional<UserEntity> result = userRepository.findByEmailAndStatus("kyj91032@naver.com", UserStatus.PENDING);
+		Optional<UserEntity> result = userJpaRepository.findByEmailAndStatus("kyj91032@naver.com", UserStatus.PENDING);
 
 		// then
 		assertThat(result.isEmpty()).isTrue();
