@@ -1,4 +1,4 @@
-package com.example.demo.repository;
+package com.example.demo.user.infrastructure;
 
 import static org.assertj.core.api.AssertionsForClassTypes.*;
 
@@ -10,8 +10,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.jdbc.Sql;
 
 import com.example.demo.user.domain.UserStatus;
-import com.example.demo.user.infrastructure.UserEntity;
-import com.example.demo.user.infrastructure.UserRepository;
 
 @DataJpaTest // DataJpaTest 어노테이션을 사용하면 JPA 관련된 설정만 로드하고, H2 데이터베이스를 사용하게 된다.
 @Sql("/sql/user-repository-test-data.sql") // @Sql 어노테이션을 사용하면 테스트 전에 SQL 파일을 실행할 수 있다.
