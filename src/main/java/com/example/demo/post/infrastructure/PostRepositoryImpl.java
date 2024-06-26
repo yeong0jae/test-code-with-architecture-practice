@@ -1,26 +1,24 @@
 package com.example.demo.post.infrastructure;
 
-import java.util.Optional;
-
-import org.springframework.stereotype.Repository;
-
+import com.example.demo.post.domain.Post;
 import com.example.demo.post.service.port.PostRepository;
-
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
 public class PostRepositoryImpl implements PostRepository {
 
-	private final PostJpaRepository postJpaRepository;
+    private final PostJpaRepository postJpaRepository;
 
-	@Override
-	public Optional<PostEntity> findById(long id) {
-		return postJpaRepository.findById(id);
-	}
+    @Override
+    public Optional<Post> findById(long id) {
+        return postJpaRepository.findById(id).map(PostEntity::toModel);
+    }
 
-	@Override
-	public PostEntity save(PostEntity postEntity) {
-		return postJpaRepository.save(postEntity);
-	}
+    @Override
+    public Post save(Post post) {
+        return postJpaRepository.save(PostEntity.fromModel(post)).toModel();
+    }
 }
