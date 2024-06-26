@@ -1,6 +1,8 @@
 package com.example.demo.user.service;
 
 import com.example.demo.common.domain.exception.ResourceNotFoundException;
+import com.example.demo.common.service.port.ClockHolder;
+import com.example.demo.common.service.port.UuidHolder;
 import com.example.demo.user.domain.User;
 import com.example.demo.user.domain.UserCreate;
 import com.example.demo.user.domain.UserStatus;
@@ -17,6 +19,8 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final CertificationService certificationService;
+    private final UuidHolder uuidHolder;
+    private final ClockHolder clockHolder;
 
     @Value("${spring.mail.username}")
     private String fromEmail;
@@ -33,7 +37,7 @@ public class UserService {
 
     @Transactional
     public User create(UserCreate userCreate) {
-        User user = User.from(userCreate); // User 객체 생성은 Service가 아닌 Domain이 책임을 갖도록 함 -> from 메소드 구현
+        User user = User.from(userCreate, uuidHolder); // User 객체 생성은 Service가 아닌 Domain이 책임을 갖도록 함 -> from 메소드 구현
         user = userRepository.save(user);
         certificationService.send(userCreate.getEmail(), user.getId(), user.getCertificationCode());
         return user;
@@ -50,7 +54,7 @@ public class UserService {
     @Transactional
     public void login(long id) {
         User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Users", id));
-        user = user.login();
+        user = user.login(clockHolder);
         userRepository.save(user);
     }
 
