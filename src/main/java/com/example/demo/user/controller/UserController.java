@@ -50,6 +50,7 @@ public class UserController {
                 .build();
     }
 
+    // TODO : MyInfoController 로 분리
     @GetMapping("/me")
     public ResponseEntity<MyProfileResponse> getMyInfo(
             @Parameter(name = "EMAIL", in = ParameterIn.HEADER)

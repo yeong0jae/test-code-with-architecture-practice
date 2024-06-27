@@ -46,7 +46,7 @@ public class UserEntity {
     // domain은 어디에도 의존하지 않도록 설계해야 한다.
     // 테스트하기 쉽고, 유지보수하기 쉬운 코드를 작성하기 위해선 domain이 infra에 의존하면 안된다.
 
-    public static UserEntity fromModel(User user) { // fromModel : User(domain) -> UserEntity(infra)
+    public static UserEntity from(User user) { // fromModel : User(domain) -> UserEntity(infra)
         UserEntity userEntity = new UserEntity();
         userEntity.id = user.getId();
         userEntity.email = user.getEmail();
