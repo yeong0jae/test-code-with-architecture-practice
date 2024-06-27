@@ -66,8 +66,7 @@ public class PostServiceTest {
         // then
         Post post = postService.getById(2);
         assertThat(post.getContent()).isEqualTo("hello world :)");
-        System.out.println(post.getModifiedAt());
-        assertThat(post.getModifiedAt()).isGreaterThan(0);
+        assertThat(post.getModifiedAt()).isEqualTo(1678530673958L);
     }
 
 }
