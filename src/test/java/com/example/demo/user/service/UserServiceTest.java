@@ -18,13 +18,13 @@ import org.junit.jupiter.api.Test;
 
 public class UserServiceTest {
 
-    private UserService userService;
+    private UserServiceImpl userService;
 
     @BeforeEach
     void initializeUserService() {
         FakeMailSender fakeMailSender = new FakeMailSender();
         FakeUserRepository fakeUserRepository = new FakeUserRepository();
-        this.userService = new UserService(
+        this.userService = new UserServiceImpl(
                 fakeUserRepository,
                 new CertificationService(fakeMailSender),
                 new TestUuidHolder("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
