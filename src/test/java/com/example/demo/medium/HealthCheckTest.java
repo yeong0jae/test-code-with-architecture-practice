@@ -1,4 +1,4 @@
-package com.example.demo.common.controller;
+package com.example.demo.medium;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -17,16 +17,16 @@ import org.springframework.test.web.servlet.MockMvc;
 @AutoConfigureTestDatabase
 public class HealthCheckTest {
 
-	@Autowired
-	private MockMvc mockMvc;
+    @Autowired
+    private MockMvc mockMvc;
 
-	@Test
-	void 헬스_체크_응답이_200으로_내려온다() throws Exception {
-		// given
-		// when
-		// then
-		mockMvc.perform(get("/health_check.html"))
-			.andExpect(status().isOk());
-	}
+    @Test
+    void 헬스_체크_응답이_200으로_내려온다() throws Exception {
+        // given
+        // when
+        // then
+        mockMvc.perform(get("/health_check.html"))
+                .andExpect(status().isOk());
+    }
 
 }

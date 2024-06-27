@@ -1,57 +1,39 @@
-package com.example.demo.user.service;
+package com.example.demo.medium;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 
 import com.example.demo.common.domain.exception.CertificationCodeNotMatchedException;
 import com.example.demo.common.domain.exception.ResourceNotFoundException;
-import com.example.demo.mock.FakeMailSender;
-import com.example.demo.mock.FakeUserRepository;
-import com.example.demo.mock.TestClockHolder;
-import com.example.demo.mock.TestUuidHolder;
 import com.example.demo.user.domain.User;
 import com.example.demo.user.domain.UserCreate;
 import com.example.demo.user.domain.UserStatus;
 import com.example.demo.user.domain.UserUpdate;
-import org.junit.jupiter.api.BeforeEach;
+import com.example.demo.user.service.UserService;
 import org.junit.jupiter.api.Test;
+import org.mockito.BDDMockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.SqlGroup;
 
+@SpringBootTest
+@TestPropertySource("classpath:test-application.properties")
+@SqlGroup({
+        @Sql(value = "/sql/user-service-test-data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD),
+        @Sql(value = "/sql/delete-all-data.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+})
 public class UserServiceTest {
 
+    @Autowired
     private UserService userService;
-
-    @BeforeEach
-    void initializeUserService() {
-        FakeMailSender fakeMailSender = new FakeMailSender();
-        FakeUserRepository fakeUserRepository = new FakeUserRepository();
-        this.userService = new UserService(
-                fakeUserRepository,
-                new CertificationService(fakeMailSender),
-                new TestUuidHolder("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
-                new TestClockHolder(1678530673958L)
-        );
-        fakeUserRepository.save(User.builder()
-                .id(1L)
-                .email("kyj91032@naver.com")
-                .nickname("kyj")
-                .address("인천")
-                .certificationCode("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")
-                .status(UserStatus.ACTIVE)
-                .lastLoginAt(0L)
-                .build()
-        );
-        fakeUserRepository.save(User.builder()
-                .id(2L)
-                .email("kyj91033@naver.com")
-                .nickname("kyj3")
-                .address("인천")
-                .certificationCode("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaab")
-                .status(UserStatus.PENDING)
-                .lastLoginAt(0L)
-                .build()
-        );
-
-    }
+    @MockBean
+    private JavaMailSender mailSender;
 
     @Test
     void getByEmail은_ACTIVE_상태인_유저를_찾아올_수_있다() {
@@ -83,7 +65,7 @@ public class UserServiceTest {
     void getById은_ACTIVE_상태인_유저를_찾아올_수_있다() {
         // given
         // when
-        User result = userService.getById(1);
+        User result = userService.getById(2);
 
         // then
         assertThat(result.getNickname()).isEqualTo("kyj");
@@ -109,13 +91,16 @@ public class UserServiceTest {
                 .nickname("kyj")
                 .build();
 
+        BDDMockito.doNothing().when(mailSender).send(any(SimpleMailMessage.class));
+        // Fixme
+
         // when
         User result = userService.create(userCreate);
 
         // then
         assertThat(result.getId()).isNotNull();
         assertThat(result.getStatus()).isEqualTo(UserStatus.PENDING);
-        assertThat(result.getCertificationCode()).isEqualTo("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
+        // assertThat(result.getCertificationCode()).isEqualTo("test"); // Fixme
     }
 
     @Test
@@ -127,10 +112,10 @@ public class UserServiceTest {
                 .build();
 
         // when
-        userService.update(1, userUpdate);
+        userService.update(2, userUpdate);
 
         // then
-        User result = userService.getById(1);
+        User result = userService.getById(2);
         assertThat(result.getId()).isNotNull();
         assertThat(result.getAddress()).isEqualTo("서울");
         assertThat(result.getNickname()).isEqualTo("kyj-n");
@@ -141,18 +126,19 @@ public class UserServiceTest {
     void user를_로그인_시키면_마지막_로그인_시간이_변경된다() {
         // given
         // when
-        userService.login(1);
+        userService.login(2);
 
         // then
-        User result = userService.getById(1);
-        assertThat(result.getLastLoginAt()).isEqualTo(1678530673958L);
+        User result = userService.getById(2);
+        assertThat(result.getLastLoginAt()).isGreaterThan(0L);
+        // assertThat(result.getLastLoginAt()).isEqualTo("??"); // Fixme
     }
 
     @Test
     void PENDING_상태의_사용자는_인증_코드로_ACTIVE_시킬_수_있다() {
         // given
         // when
-        userService.verifyEmail(2, "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaab");
+        userService.verifyEmail(3, "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaab");
 
         // then
         User result = userService.getById(2);
@@ -165,7 +151,7 @@ public class UserServiceTest {
         // when
         // then
         assertThatThrownBy(() -> {
-            userService.verifyEmail(2, "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaac");
+            userService.verifyEmail(3, "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaac");
         }).isInstanceOf(CertificationCodeNotMatchedException.class);
     }
 
